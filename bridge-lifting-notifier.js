@@ -26,19 +26,19 @@ async function main() {
 
   if (hasChanged) {
     await bridgeLiftingRepository.addBridgeLiftingReport(bridgeLiftingMessage);
+
+    const chats = await chatsRepository.getChats();
+
+    await bot.launch();
+
+    const tasks = chats.map((chat) =>
+      bot.telegram.sendMessage(chat["telegram_chat_id"], bridgeLiftingMessage)
+    );
+
+    await Promise.all(tasks);
+
+    bot.stop();
   }
-
-  const chats = await chatsRepository.getChats();
-
-  await bot.launch();
-
-  const tasks = chats.map((chat) =>
-    bot.telegram.sendMessage(chat["telegram_chat_id"], bridgeLiftingMessage)
-  );
-
-  await Promise.all(tasks);
-
-  bot.stop();
 
   (await getClient()).close();
 }
